@@ -47,7 +47,7 @@ function BoxBase(propriedade) {
 
 
 export default function Home() {
-  const usuarioAleatorio = 'teste';
+  const usuarioAleatorio = 'devhikary';
   const pessoasFavoritas = [
     'juunegreiros',
     'omariosouto',
@@ -59,24 +59,25 @@ export default function Home() {
   const [comunidades, setComunidades] = React.useState([{}]);
   const [seguidores, setSeguidores] = React.useState([]);
 
-  React.useEffect(function() {
+  React.useEffect(function () {
     // GET
-    fetch('https://api.github.com/users/peas/followers')
-    .then(function (respostaDoServidor) {
-      return respostaDoServidor.json();
-    })
-    .then(function(respostaCompleta) {
-      setSeguidores(respostaCompleta);
-    })
-      // API GraphQL
-      fetch('https://graphql.datocms.com/', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'cb207001c98974b6fbbd7ab63c81b4',
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ "query": `query{
+    fetch(`https://api.github.com/users/${usuarioAleatorio}/followers`)
+      .then(function (respostaDoServidor) {
+        return respostaDoServidor.json();
+      })
+      .then(function (respostaCompleta) {
+        setSeguidores(respostaCompleta);
+      })
+    // API GraphQL
+    fetch('https://graphql.datocms.com/', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'df02a478edcb73e4000c74bbdd883a',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        "query": `query{
           allComunidades{
             id
             title
@@ -84,18 +85,18 @@ export default function Home() {
             creatorslug
         }
         }` })
-      })
+    })
       .then((response) => response.json()) // Pega o retorno do response.json() e já retorna
       .then((respostaCompleta) => {
         const comunidadesVindasDoDato = respostaCompleta.data.allComunidades;
         console.log(comunidadesVindasDoDato)
         setComunidades(comunidadesVindasDoDato)
       })
-      // .then(function (response) {
-      //   return response.json()
-      // })
-  
-    }, [])
+    // .then(function (response) {
+    //   return response.json()
+    // })
+
+  }, [])
 
   return (
     <>
@@ -114,27 +115,27 @@ export default function Home() {
           <Box>
             <h2 className="subTitle">O que você deseja fazer?</h2>
             <form onSubmit={function handleCriaComunidade(e) {
-                e.preventDefault();
-                const dadosDoForm = new FormData(e.target);
+              e.preventDefault();
+              const dadosDoForm = new FormData(e.target);
 
-                console.log('Campo: ', dadosDoForm.get('title'));
-                console.log('Campo: ', dadosDoForm.get('url'));
-                
-                const comunidade = {
-                  title: dadosDoForm.get('title'),
-                  url: dadosDoForm.get('url'),
-                  creatorSlug: usuarioAleatorio,
-                }
-                console.log('comunidade: ', comunidade);
-                
-                fetch('/api/comunidades', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                  },
-                  body: JSON.stringify(comunidade)
-                })
+              console.log('Campo: ', dadosDoForm.get('title'));
+              console.log('Campo: ', dadosDoForm.get('url'));
+
+              const comunidade = {
+                title: dadosDoForm.get('title'),
+                url: dadosDoForm.get('url'),
+                creatorslug: usuarioAleatorio,
+              }
+              console.log('comunidade: ', comunidade);
+
+              fetch('/api/comunidades', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json'
+                },
+                body: JSON.stringify(comunidade)
+              })
                 .then(async (response) => {
                   const dados = await response.json();
                   console.log(dados.registroCriado);
@@ -184,7 +185,7 @@ export default function Home() {
             </ul>
           </ProfileRelationsBoxWrapper>
           <ProfileRelationsBoxWrapper>
-            {/* <h2 className="smallTitle">
+            <h2 className="smallTitle">
               Comunidades ({comunidades.length})
             </h2>
             <ul>
@@ -192,14 +193,14 @@ export default function Home() {
                 return (
                   <li key={itemAtual.id}>
                     <a href={`/users/${itemAtual.title}`}>
-                      <img src={itemAtual.image} />
+                      <img src={itemAtual.url} />
                       <span>{itemAtual.title}</span>
                     </a>
                   </li>
                 )
               })}
-            </ul> */}
-            <BoxBase section={comunidades} title={'Comunidades'} />
+            </ul>
+            {/* <BoxBase section={comunidades} title={'Comunidades'} /> */}
           </ProfileRelationsBoxWrapper>
           <ProfileRelationsBoxWrapper >
             <h2 className="smallTitle">

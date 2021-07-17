@@ -2,7 +2,7 @@ import { SiteClient } from 'datocms-client';
 
 export default async function recebedorDeRequests(request, response) {
     if(request.method === 'POST') {
-        const TOKEN = 'cb207001c98974b6fbbd7ab63c81b4';
+        const TOKEN = 'e51474fba4d00963488ec44bece8b1';
         const client = new SiteClient(TOKEN);
         
         // Validar os dados, antes de sair cadastrando
@@ -13,7 +13,7 @@ export default async function recebedorDeRequests(request, response) {
             // imageUrl: "https://github.com/omariosouto.png",
             // creatorSlug: "omariosouto"
         })
-    
+
         console.log(registroCriado);
     
         response.json({
