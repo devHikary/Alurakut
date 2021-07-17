@@ -6,6 +6,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@material-ui/core": "^4.12.1",
     "datocms-client": "^3.4.11",
     "jsonwebtoken": "^8.5.1",
     "next": "latest",
