@@ -19,7 +19,7 @@ const GlobalStyle = createGlobalStyle`
 
   #__next{
     display: flex;
-    min-heght: 100vh;
+    min-height: 100vh;
     flex-direction: column;
   }
 

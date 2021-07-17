@@ -1,4 +1,6 @@
 import React from 'react';
+import nookies from 'nookies';
+import jwt from 'jsonwebtoken';
 import MainGrid from '../src/components/MainGrid';
 import Box from '../src/components/Box';
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
@@ -46,8 +48,8 @@ function BoxBase(propriedade) {
 }
 
 
-export default function Home() {
-  const usuarioAleatorio = 'devhikary';
+export default function Home(props) {
+  const usuarioAleatorio = props.githubUser;
   const pessoasFavoritas = [
     'juunegreiros',
     'omariosouto',
@@ -100,6 +102,7 @@ export default function Home() {
 
   return (
     <>
+    <title>Alurakut</title>
       <AlurakutMenu />
       <MainGrid>
         <div className="profileArea" style={{ gridArea: 'profileArea' }}>
@@ -108,7 +111,7 @@ export default function Home() {
         <div className="welcomeArea" style={{ gridArea: 'welcomeArea' }}>
           <Box >
             <h1 className="title">
-              Bem vindo(a)
+              Bem vindo(a), {usuarioAleatorio}
             </h1>
             <OrkutNostalgicIconSet />
           </Box>
@@ -225,4 +228,33 @@ export default function Home() {
       </MainGrid>
     </>
   )
+}
+
+export async function getServerSideProps(context) {
+  const cookies = nookies.get(context)
+  const token = cookies.USER_TOKEN;
+  const { isAuthenticated } = await fetch('http://localhost:3000/api/auth', {
+    headers: {
+        Authorization: token
+      }
+  })
+  .then((resposta) => resposta.json())
+
+  console.log(isAuthenticated)
+
+  if(!isAuthenticated) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      }
+    }
+  }
+
+  const { githubUser } = jwt.decode(token);
+  return {
+    props: {
+      githubUser
+    }, // will be passed to the page component as props
+  }
 }
