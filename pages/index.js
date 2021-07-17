@@ -74,7 +74,7 @@ export default function Home(props) {
     fetch('https://graphql.datocms.com/', {
       method: 'POST',
       headers: {
-        'Authorization': 'df02a478edcb73e4000c74bbdd883a',
+        'Authorization': process.env.NEXT_PUBLIC_DATO_READ,
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
@@ -192,7 +192,7 @@ export default function Home(props) {
               Comunidades ({comunidades.length})
             </h2>
             <ul>
-              {comunidades.map((itemAtual) => {
+              {comunidades.slice(0, 6).map((itemAtual) => {
                 return (
                   <li key={itemAtual.id}>
                     <a href={`/users/${itemAtual.title}`}>
