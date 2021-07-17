@@ -34,7 +34,7 @@ function BoxBase(propriedade) {
           return (
             <li key={itemAtual.id}>
               <a href={`/users/${itemAtual.title}`}>
-                <img src={itemAtual.image} />
+                <img src={itemAtual.url} />
                 <span>{itemAtual.title}</span>
               </a>
             </li>
@@ -47,7 +47,7 @@ function BoxBase(propriedade) {
 
 
 export default function Home() {
-  const usuarioAleatorio = 'devhikary';
+  const usuarioAleatorio = 'teste';
   const pessoasFavoritas = [
     'juunegreiros',
     'omariosouto',
@@ -56,27 +56,46 @@ export default function Home() {
     'marcobrunodev',
     'felipefialho',
   ]
+  const [comunidades, setComunidades] = React.useState([{}]);
   const [seguidores, setSeguidores] = React.useState([]);
-  // 0 - Pegar o array de dados do github 
-  React.useEffect(function () {
+
+  React.useEffect(function() {
+    // GET
     fetch('https://api.github.com/users/peas/followers')
-      .then(function (respostaDoServidor) {
-        return respostaDoServidor.json();
+    .then(function (respostaDoServidor) {
+      return respostaDoServidor.json();
+    })
+    .then(function(respostaCompleta) {
+      setSeguidores(respostaCompleta);
+    })
+      // API GraphQL
+      fetch('https://graphql.datocms.com/', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'cb207001c98974b6fbbd7ab63c81b4',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ "query": `query{
+          allComunidades{
+            id
+            title
+            url
+            creatorslug
+        }
+        }` })
       })
-      .then(function (respostaCompleta) {
-        setSeguidores(respostaCompleta);
+      .then((response) => response.json()) // Pega o retorno do response.json() e já retorna
+      .then((respostaCompleta) => {
+        const comunidadesVindasDoDato = respostaCompleta.data.allComunidades;
+        console.log(comunidadesVindasDoDato)
+        setComunidades(comunidadesVindasDoDato)
       })
-  }, [])
-
-  console.log('seguidores antes do return', seguidores);
-
-  // 1 - Criar um box que vai ter um map, baseado nos items do array
-  // que pegamos do GitHub
-  const [comunidades, setComunidades] = React.useState([{
-    id: '12802378123789378912789789123896123',
-    title: 'Eu odeio acordar cedo',
-    image: 'https://alurakut.vercel.app/capa-comunidade-01.jpg'
-  }]);
+      // .then(function (response) {
+      //   return response.json()
+      // })
+  
+    }, [])
 
   return (
     <>
@@ -95,19 +114,34 @@ export default function Home() {
           <Box>
             <h2 className="subTitle">O que você deseja fazer?</h2>
             <form onSubmit={function handleCriaComunidade(e) {
-              e.preventDefault();
-              const dadosDoForm = new FormData(e.target);
+                e.preventDefault();
+                const dadosDoForm = new FormData(e.target);
 
-              console.log('Campo: ', dadosDoForm.get('title'));
-              console.log('Campo: ', dadosDoForm.get('image'));
-
-              const comunidade = {
-                id: new Date().toISOString(),
-                title: dadosDoForm.get('title'),
-                image: dadosDoForm.get('image'),
-              }
-              const comunidadesAtualizadas = [...comunidades, comunidade];
-              setComunidades(comunidadesAtualizadas)
+                console.log('Campo: ', dadosDoForm.get('title'));
+                console.log('Campo: ', dadosDoForm.get('url'));
+                
+                const comunidade = {
+                  title: dadosDoForm.get('title'),
+                  url: dadosDoForm.get('url'),
+                  creatorSlug: usuarioAleatorio,
+                }
+                console.log('comunidade: ', comunidade);
+                
+                fetch('/api/comunidades', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                  },
+                  body: JSON.stringify(comunidade)
+                })
+                .then(async (response) => {
+                  const dados = await response.json();
+                  console.log(dados.registroCriado);
+                  const comunidade = dados.registroCriado;
+                  const comunidadesAtualizadas = [...comunidades, comunidade];
+                  setComunidades(comunidadesAtualizadas)
+                })
             }}>
               <div>
                 <input
@@ -120,7 +154,7 @@ export default function Home() {
               <div>
                 <input
                   placeholder="Coloque uma URL para usarmos de capa"
-                  name="image"
+                  name="url"
                   aria-label="Coloque uma URL para usarmos de capa"
                 />
               </div>
