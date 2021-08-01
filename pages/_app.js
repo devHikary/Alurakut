@@ -41,8 +41,8 @@ const theme = {
 export default function App({ Component, pageProps }) {
   return (
     <>
-      <GlobalStyle />
       <ThemeProvider theme={theme}>
+      <GlobalStyle />
         <Component {...pageProps} />
       </ThemeProvider>
     </>
